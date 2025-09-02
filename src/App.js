@@ -11,10 +11,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/" element={isLoggedIn ? <Dashboard /> : <Navigate to="/Login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/login" />} />
+        <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/Login" />} />
       </Routes>
     </Router>
   );
