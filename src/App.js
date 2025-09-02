@@ -4,17 +4,38 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Statistics from "./pages/Statistics";
+import Header from "./components/Header";
+
+function RequireAuth({ children }) {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  return isLoggedIn ? children : <Navigate to="/login" />;
+}
 
 function App() {
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
-
   return (
     <Router>
+      <Header />
       <Routes>
-        <Route path="/" element={isLoggedIn ? <Dashboard /> : <Navigate to="/Login" />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/Login" />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/statistics"
+          element={
+            <RequireAuth>
+              <Statistics />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </Router>
   );

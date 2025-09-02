@@ -1,49 +1,81 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const [name, setName] = useState("");
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [blood, setBlood] = useState("A");
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleAccountNext = (e) => {
     e.preventDefault();
-    const user = { name, email, password };
+    if (!email || !password) return alert("Điền email và mật khẩu");
+    setStep(2);
+  };
+
+  const handleFinish = (e) => {
+    e.preventDefault();
+    if (!height || !weight) return alert("Nhập chiều cao và cân nặng");
+    // lưu user và info
+    const user = { email, password };
+    const userInfo = { email, height: Number(height), weight: Number(weight), blood };
     localStorage.setItem("user", JSON.stringify(user));
-    alert("Đăng ký thành công! Hãy đăng nhập.");
-    navigate("/login");
+    localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    // khởi tạo water records nếu chưa có
+    if (!localStorage.getItem("waterRecords")) localStorage.setItem("waterRecords", JSON.stringify({}));
+    // auto login và chuyển tới dashboard
+    localStorage.setItem("isLoggedIn", "true");
+    navigate("/dashboard");
   };
 
   return (
-    <form onSubmit={handleRegister} style={{ maxWidth: 400, margin: "100px auto" }}>
-      <h2>Đăng ký</h2>
-      <input
-        type="text"
-        placeholder="Họ tên"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-        style={{ display: "block", margin: "10px 0", padding: "8px" }}
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        style={{ display: "block", margin: "10px 0", padding: "8px" }}
-      />
-      <input
-        type="password"
-        placeholder="Mật khẩu"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        style={{ display: "block", margin: "10px 0", padding: "8px" }}
-      />
-      <button type="submit">Đăng ký</button>
-      <p>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p>
-    </form>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "75vh" }}>
+      <div className="card p-4 card-rounded shadow-sm" style={{ width: 420 }}>
+        {step === 1 ? (
+          <>
+            <h4 className="mb-3">Tạo tài khoản</h4>
+            <form onSubmit={handleAccountNext}>
+              <div className="mb-2">
+                <input className="form-control" placeholder="Email" type="email" value={email} onChange={(e)=>setEmail(e.target.value)} required />
+              </div>
+              <div className="mb-3">
+                <input className="form-control" placeholder="Mật khẩu" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} required />
+              </div>
+              <div className="d-flex justify-content-between">
+                <button type="submit" className="btn btn-primary">Tiếp</button>
+                <button type="button" className="btn btn-outline-secondary" onClick={()=>navigate("/login")}>Đã có tài khoản</button>
+              </div>
+            </form>
+          </>
+        ) : (
+          <>
+            <h4 className="mb-3">Thông tin cá nhân</h4>
+            <form onSubmit={handleFinish}>
+              <div className="mb-2">
+                <input className="form-control" placeholder="Chiều cao (cm)" type="number" value={height} onChange={(e)=>setHeight(e.target.value)} required />
+              </div>
+              <div className="mb-2">
+                <input className="form-control" placeholder="Cân nặng (kg)" type="number" value={weight} onChange={(e)=>setWeight(e.target.value)} required />
+              </div>
+              <div className="mb-3">
+                <select className="form-select" value={blood} onChange={(e)=>setBlood(e.target.value)}>
+                  <option value="A">Nhóm máu A</option>
+                  <option value="B">Nhóm máu B</option>
+                  <option value="AB">Nhóm máu AB</option>
+                  <option value="O">Nhóm máu O</option>
+                </select>
+              </div>
+              <div className="d-flex justify-content-between">
+                <button type="button" className="btn btn-outline-secondary" onClick={()=>setStep(1)}>Quay lại</button>
+                <button type="submit" className="btn btn-success">Hoàn tất & vào Dashboard</button>
+              </div>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
